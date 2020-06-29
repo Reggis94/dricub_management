@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -35,6 +37,16 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Course::class, mappedBy="instructor")
+     */
+    private $instructorCourses;
+
+    public function __construct()
+    {
+        $this->instructorCourses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -112,5 +124,36 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection|Course[]
+     */
+    public function getInstructorCourses(): Collection
+    {
+        return $this->instructorCourses;
+    }
+
+    public function addInstructorCourse(Course $instructorCourse): self
+    {
+        if (!$this->instructorCourses->contains($instructorCourse)) {
+            $this->instructorCourses[] = $instructorCourse;
+            $instructorCourse->setInstructor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInstructorCourse(Course $instructorCourse): self
+    {
+        if ($this->instructorCourses->contains($instructorCourse)) {
+            $this->instructorCourses->removeElement($instructorCourse);
+            // set the owning side to null (unless already changed)
+            if ($instructorCourse->getInstructor() === $this) {
+                $instructorCourse->setInstructor(null);
+            }
+        }
+
+        return $this;
     }
 }
