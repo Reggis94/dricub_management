@@ -33,11 +33,11 @@ class SecurityController extends AbstractController
     {
         if($this->isGranted('ROLE_ADMIN'))
         {
-            $this->redirectToRoute("admin_next_classes");
+            return $this->redirectToRoute("admin_next_classes");
         }
         else if($this->isGranted('ROLE_INSTRUCTOR'))
         {
-            $this->redirectToRoute("instructor_next_classes");
+            return $this->redirectToRoute("instructor_next_classes");
         }
     }
 
